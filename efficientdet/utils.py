@@ -20,6 +20,8 @@ class BBoxTransform(nn.Module):
         x_centers_a = (anchors[..., 1] + anchors[..., 3]) / 2
         ha = anchors[..., 2] - anchors[..., 0]
         wa = anchors[..., 3] - anchors[..., 1]
+        print(wa)
+        print(ha)
 
         w = regression[..., 3].exp() * wa
         h = regression[..., 2].exp() * ha
