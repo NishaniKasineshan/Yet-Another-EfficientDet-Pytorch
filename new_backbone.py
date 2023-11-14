@@ -17,7 +17,7 @@ class EfficientDetBackbone(nn.Module):
         self.backbone_compound_coef = [0, 1, 2, 3, 4, 5, 6, 6, 7]
         self.fpn_num_filters = [64, 88, 112, 160, 224, 288, 384, 384, 384]
         self.fpn_cell_repeats = [3, 4, 5, 6, 7, 7, 8, 8, 8]
-        self.input_sizes = [512, 640, 768, 896, 1024, 1280, 1280, 1536, 1536]
+        self.input_sizes = [64,512, 640, 768, 896, 1024, 1280, 1280, 1536, 1536]
         self.box_class_repeats = [3, 3, 3, 4, 4, 4, 5, 5, 5]
         self.pyramid_levels = [5, 5, 5, 5, 5, 5, 5, 5, 6]
         self.anchor_scale = [4., 4., 4., 4., 4., 4., 4., 5., 4.]
@@ -27,7 +27,8 @@ class EfficientDetBackbone(nn.Module):
             # the channels of P3/P4/P5.
             # 0: [512,1024, 2048],
             # 0: [160,320,640],
-            0: [40, 112, 320],
+            # 0: [40, 112, 320],
+            0: [64, 128, 256],
             1: [40, 112, 320],
             2: [48, 120, 352],
             3: [48, 136, 384],
@@ -58,10 +59,10 @@ class EfficientDetBackbone(nn.Module):
                                      pyramid_levels=self.pyramid_levels[self.compound_coef])
 
         self.anchors = Anchors(anchor_scale=self.anchor_scale[compound_coef],
-                               pyramid_levels=(torch.arange(self.pyramid_levels[self.compound_coef]) + 3).tolist(),
+                               pyramid_levels=(torch.arange(self.pyramid_levels[self.compound_coef]) + 0).tolist(),
                                **kwargs)
 
-        self.backbone_net = EfficientNet(self.backbone_compound_coef[compound_coef], load_weights)
+        # self.backbone_net = EfficientNet(self.backbone_compound_coef[compound_coef], load_weights)
         
         # self.backbone_net=ResNet(BottleNeck)
         
@@ -69,7 +70,7 @@ class EfficientDetBackbone(nn.Module):
         # model.eval()
         # self.backbone_net=model
          
-        # self.backbone_net=RegNet(regulated_block=rnn_regulated_block, in_dim=3, h_dim=128, intermediate_channels=16, cell_type='lstm', layers=[3,3,3,3,3,3,3])
+        self.backbone_net=RegNet(regulated_block=rnn_regulated_block, in_dim=3, h_dim=128, intermediate_channels=16, cell_type='lstm', layers=[3,3,3,3])
        
         # net_tv = models.resnet50(pretrained=False)
         # self.backbone_net=net_tv
@@ -84,8 +85,8 @@ class EfficientDetBackbone(nn.Module):
     def forward(self, inputs):
         # max_size = inputs.shape[-1]
 
-        _, p3, p4, p5 = self.backbone_net(inputs)
-        # p3, p4, p5 = self.backbone_net(inputs)
+        # _, p3, p4, p5 = self.backbone_net(inputs)
+        p3, p4, p5 = self.backbone_net(inputs)
         
         # p3, p4, p5 = GetFeatureMapsFromResnet(self.backbone_net,inputs)
 
