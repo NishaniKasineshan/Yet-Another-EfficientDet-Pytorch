@@ -223,7 +223,7 @@ class RegNet(pl.LightningModule):
         
         # return self.output(x)
         
-        return x_fmaps[3],x_fmaps[4],x_fmaps[5]
+        return x_fmaps[0],x_fmaps[1],x_fmaps[2]
 
 
     # def configure_optimizers(self):
