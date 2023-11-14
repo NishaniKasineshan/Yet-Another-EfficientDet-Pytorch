@@ -6,6 +6,7 @@ import argparse
 import datetime
 import os
 import traceback
+import gc
 
 import numpy as np
 import torch
@@ -109,7 +110,7 @@ def train(opt):
                   'collate_fn': collater,
                   'num_workers': opt.num_workers}
 
-    input_sizes = [512, 640, 768, 896, 1024, 1280, 1280, 1536, 1536]
+    input_sizes = [64,512, 640, 768, 896, 1024, 1280, 1280, 1536, 1536]
     training_set = CocoDataset(root_dir=os.path.join(opt.data_path, params.project_name), set=params.train_set,
                                transform=transforms.Compose([Normalizer(mean=params.mean, std=params.std),
                                                              Augmenter(),
@@ -201,6 +202,8 @@ def train(opt):
     num_iter_per_epoch = len(training_generator)
 
     try:
+        torch.cuda.empty_cache()
+        gc.collect()
         for epoch in range(opt.num_epochs):
             last_epoch = step // num_iter_per_epoch
             if epoch < last_epoch:
